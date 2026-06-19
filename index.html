@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1인 사업가 일상 밸런스 데일리 스케줄러</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header Area -->
+    <header>
+      <div class="header-top">
+        <div class="header-title">
+          <h1>🗓️ 일상 밸런스 데일리 스케줄러</h1>
+          <p>1인 사업가의 건강하고 유연한 하루 루틴 관리를 위한 동반자</p>
+        </div>
+        <div class="header-clock-widget">
+          <div id="current-time">00:00:00</div>
+          <div id="current-date">2026년 06월 20일 토요일</div>
+        </div>
+      </div>
+      
+      <!-- Day Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-label">
+          <span>오늘의 루틴 달성도</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar" id="routine-progress"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Left side: Timeline Scheduler -->
+    <main class="dashboard-left">
+      <!-- ☀️ 아침 블록 -->
+      <div class="time-block-group" data-block="morning">
+        <div class="time-block-group-header">
+          <span>☀️ 아침 블록: 하루의 정돈 (07:00 ~ 10:00)</span>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item" id="routine-1" data-start="07:00" data-end="08:00">
+            <div class="timeline-time">07:00 - 08:00</div>
+            <div class="timeline-content">
+              <div class="timeline-title">기상 및 건강 🌱</div>
+              <div class="timeline-desc">가벼운 스트레칭, 물 마시기, 아침 식사 (일-삶 균형의 첫걸음)</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-1')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-2" data-start="08:00" data-end="09:30">
+            <div class="timeline-time">08:00 - 09:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">어머니 돕기 및 집/살림 🧹</div>
+              <div class="timeline-desc">어머니 챙겨드리기, 간단한 아침 청소나 환기, 세탁기 돌리기 등</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-2')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-3" data-start="09:30" data-end="10:00">
+            <div class="timeline-time">09:30 - 10:00</div>
+            <div class="timeline-content">
+              <div class="timeline-title">데일리 플래닝 🎯</div>
+              <div class="timeline-desc">오늘 무조건 끝낼 핵심 업무 딱 1가지만 정하기 (미루기 방지)</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-3')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 💻 오전 집중 블록 -->
+      <div class="time-block-group" data-block="focus">
+        <div class="time-block-group-header">
+          <span>💻 오전 집중 블록: 가장 중요한 일 먼저 (10:00 ~ 12:30)</span>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item" id="routine-4" data-start="10:00" data-end="11:30">
+            <div class="timeline-time">10:00 - 11:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">AI 인공지능 공부 및 사업 준비 🚀</div>
+              <div class="timeline-desc">하루 중 에너지가 가장 높은 시간에 1순위 업무 배치</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-4')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-5" data-start="11:30" data-end="12:30">
+            <div class="timeline-time">11:30 - 12:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">추가 학습 또는 자료 조사 🔍</div>
+              <div class="timeline-desc">앞선 공부의 복습이나 사업에 필요한 가벼운 아이디어 정리</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-5')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🥗 점심 및 휴식 블록 -->
+      <div class="time-block-group" data-block="rest">
+        <div class="time-block-group-header">
+          <span>🥗 점심 및 휴식 블록: 완전한 분리 (12:30 ~ 14:00)</span>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item" id="routine-6" data-start="12:30" data-end="14:00">
+            <div class="timeline-time">12:30 - 14:00</div>
+            <div class="timeline-content">
+              <div class="timeline-title">점심 식사 및 온전한 휴식 ☕</div>
+              <div class="timeline-desc">일하는 공간에서 벗어나기. 가벼운 산책이나 낮잠 등 뇌 쉬어주기</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-6')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔄 오후 밸런스 블록 -->
+      <div class="time-block-group" data-block="balance">
+        <div class="time-block-group-header">
+          <span>🔄 오후 밸런스 블록: 루틴과 유연성 (14:00 ~ 17:30)</span>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item" id="routine-7" data-start="14:00" data-end="15:30">
+            <div class="timeline-time">14:00 - 15:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">사업 준비 및 잡무 처리 📂</div>
+              <div class="timeline-desc">기획서 작성, 이메일 확인 등 상대적으로 에너지가 덜 드는 업무</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-7')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item buffer-time" id="routine-8" data-start="15:30" data-end="16:30">
+            <div class="timeline-time">15:30 - 16:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">유연한 시간 (Buffer Time) ⭐</div>
+              <div class="timeline-desc">미처 끝내지 못한 일, 어머니 돕기, 돌발 상황 해결을 위한 버퍼</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-8')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-9" data-start="16:30" data-end="17:30">
+            <div class="timeline-time">16:30 - 17:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">집/살림 및 저녁 준비 🍳</div>
+              <div class="timeline-desc">저녁 식사 준비 및 자잘한 집안일 마무리</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-9')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🌙 저녁 블록 -->
+      <div class="time-block-group" data-block="evening">
+        <div class="time-block-group-header">
+          <span>🌙 저녁 블록: 마무리와 일-삶 균형 (17:30 ~ 22:00)</span>
+        </div>
+        <div class="timeline-items">
+          <div class="timeline-item" id="routine-10" data-start="17:30" data-end="19:30">
+            <div class="timeline-time">17:30 - 19:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">저녁 식사 및 가족 시간 👨‍👩‍👦</div>
+              <div class="timeline-desc">어머니와 함께 식사하고 대화하며 편안하게 하루를 마무리</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-10')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-11" data-start="19:30" data-end="20:30">
+            <div class="timeline-time">19:30 - 20:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">건강 및 운동 🏃‍♂️</div>
+              <div class="timeline-desc">홈트레이닝, 가벼운 조깅, 스트레칭 등 체력 관리를 위한 시간</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-11')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-12" data-start="20:30" data-end="21:30">
+            <div class="timeline-time">20:30 - 21:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">개인 자유 시간 📖</div>
+              <div class="timeline-desc">일과 관련 없는 취미 활동, 독서, 휴식 등 온전한 나만의 시간</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-12')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-item" id="routine-13" data-start="21:30" data-end="22:00">
+            <div class="timeline-time">21:30 - 22:00</div>
+            <div class="timeline-content">
+              <div class="timeline-title">하루 마감 및 취침 준비 💤</div>
+              <div class="timeline-desc">내일 일정을 가볍게 확인한 뒤 잠자리에 들 준비하기</div>
+            </div>
+            <div class="timeline-action">
+              <label class="timeline-checkbox">
+                <input type="checkbox" onchange="toggleRoutine('routine-13')">
+                <span class="timeline-custom-check"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right side: Widgets & Tools -->
+    <aside class="dashboard-right">
+      <!-- 1 Core Task Widget -->
+      <section class="glass-panel" id="core-task-section">
+        <div class="panel-title">
+          <span>🎯 오늘 무조건 끝낼 핵심 업무 1가지</span>
+        </div>
+        <div class="core-task-input-wrapper">
+          <input type="text" id="core-task-input" class="core-task-input" placeholder="업무를 입력해 주세요 (예: AI 공부 1강 수강)">
+          <button class="btn-add" onclick="addCoreTask()">등록</button>
+        </div>
+        <ul id="core-task-list" class="core-task-list">
+          <!-- Dynamically generated core task -->
+        </ul>
+      </section>
+
+      <!-- Pomodoro Timer Widget -->
+      <section class="glass-panel pomodoro-card">
+        <div class="panel-title" style="justify-content: center; border: none; margin-bottom: 0.5rem;">
+          <span>⏱️ 뽀모도로 포커스 타이머</span>
+        </div>
+        
+        <div class="timer-modes">
+          <button class="btn-mode active" onclick="setTimerMode(25, 'focus')">25분 집중</button>
+          <button class="btn-mode" onclick="setTimerMode(5, 'short')">5분 시동</button>
+          <button class="btn-mode" onclick="setTimerMode(15, 'long')">15분 휴식</button>
+        </div>
+
+        <div class="timer-circle-container">
+          <svg class="timer-svg" viewBox="0 0 180 180">
+            <circle class="timer-circle-bg" cx="90" cy="90" r="80"></circle>
+            <circle class="timer-circle-progress" id="timer-progress" cx="90" cy="90" r="80"></circle>
+          </svg>
+          <div class="timer-display-wrapper">
+            <div class="timer-time" id="timer-display">25:00</div>
+            <div class="timer-label" id="timer-state-label">집중하세요!</div>
+          </div>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn-timer primary" id="btn-start" onclick="toggleTimer()">시작</button>
+          <button class="btn-timer" onclick="resetTimer()">초기화</button>
+        </div>
+      </section>
+
+      <!-- Quick Action: 5-Minute Starter -->
+      <section class="glass-panel quick-action-widget">
+        <h3>💡 시작이 귀찮으신가요?</h3>
+        <p>"AI 에이전트 공부"가 너무 거창하게 느껴진다면, 딱 5분만 책상에 앉아서 영상 1개나 첫 페이지만 보세요!</p>
+        <button class="btn-quick" onclick="startQuickFiveMinutes()">5분 시동 걸기 시작</button>
+      </section>
+
+      <!-- Motivation and Tips -->
+      <section class="glass-panel">
+        <div class="panel-title">
+          <span>🧠 미루기 극복 실천 가이드</span>
+        </div>
+        <div class="tips-container">
+          <div class="tip-card">
+            <span class="tip-icon">✨</span>
+            <div class="tip-text">
+              <h4>시작의 허들 낮추기</h4>
+              <p>행동을 극단적으로 작게 쪼개서 시작해보세요. (예: 5분만 책 읽기)</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🛡️</span>
+            <div class="tip-text">
+              <h4>유연성(Buffer)의 마법</h4>
+              <p>오후 3시 반 완충 지대를 믿고, 오전 일정이 늦어져도 자책하지 마세요.</p>
+            </div>
+          </div>
+          <div class="tip-card">
+            <span class="tip-icon">🧘</span>
+            <div class="tip-text">
+              <h4>완벽주의 내려놓기</h4>
+              <p>하루 계획의 60~70%만 완료해도 오늘은 최고의 하루입니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
