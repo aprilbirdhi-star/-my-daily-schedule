@@ -330,4 +330,11 @@ window.addEventListener('DOMContentLoaded', () => {
   
   loadRoutines();
   loadCoreTask();
+
+  // Register PWA Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registered Successfully'))
+      .catch((err) => console.error('Service Worker Registration Failed', err));
+  }
 });

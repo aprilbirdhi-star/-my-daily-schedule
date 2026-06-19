@@ -1,0 +1,18 @@
+{
+  "name": "일상 밸런스 데일리 스케줄러",
+  "short_name": "밸런스스케줄",
+  "description": "1인 사업가 및 일상 밸런스를 위한 데일리 스케줄러",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d111a",
+  "theme_color": "#0d111a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
