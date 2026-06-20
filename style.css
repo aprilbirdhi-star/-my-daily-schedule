@@ -548,38 +548,135 @@ header {
   align-items: center;
 }
 
-/* Custom Checkbox for Timeline */
-.timeline-checkbox {
-  cursor: pointer;
+/* Status Toggles */
+.timeline-status-group {
   display: flex;
+  gap: 0.35rem;
   align-items: center;
 }
 
-.timeline-checkbox input {
-  display: none;
-}
-
-.timeline-custom-check {
-  width: 22px;
-  height: 22px;
-  border: 2.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
+.btn-status {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.25rem;
 }
 
-.timeline-checkbox input:checked + .timeline-custom-check {
-  background: #10b981;
-  border-color: #10b981;
-}
-
-.timeline-checkbox input:checked + .timeline-custom-check::after {
-  content: '✓';
+.btn-status:hover {
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
+}
+
+.btn-status.success.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #34d399;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-status.fail.active {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+}
+
+/* Praise Sticker Styles */
+.praise-sticker {
+  position: absolute;
+  right: 140px;
+  top: 15px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbeb, #fef3c7);
+  border: 2px dashed #d97706;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(217, 87, 6, 0.3);
+  transform: rotate(-15deg);
+  z-index: 10;
+  pointer-events: none;
+  animation: popSticker 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.praise-sticker-inner {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.praise-sticker-text {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
+@keyframes popSticker {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-15deg);
+  }
+}
+
+/* Failure reason styles */
+.timeline-fail-container {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 0.5rem;
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+.timeline-fail-container.open {
+  display: block;
+}
+
+.timeline-fail-input {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.03);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 8px;
+  padding: 0.6rem;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+}
+
+.timeline-fail-input:focus {
+  outline: none;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.timeline-fail-indicator {
   font-size: 0.75rem;
-  font-weight: 800;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  margin-top: 0.35rem;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 /* Highlight Buffer Time specially */

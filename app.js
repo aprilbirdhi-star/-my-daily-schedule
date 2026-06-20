@@ -4,6 +4,15 @@ let timerSecondsLeft = 25 * 60;
 let timerTotalDuration = 25 * 60;
 let timerRunning = false;
 
+// Praise sticker combinations
+const STICKERS = [
+  { emoji: '💮', text: '참 잘했어요' },
+  { emoji: '🌟', text: '아주 훌륭해요' },
+  { emoji: '💪', text: '해내셨군요!' },
+  { emoji: '🏆', text: '최고입니다' },
+  { emoji: '✨', text: '빛나는 성공' }
+];
+
 // Audio context or synthesized beep fallback for alarm
 function playCompletionSound() {
   try {
@@ -20,7 +29,6 @@ function playCompletionSound() {
     
     oscillator.start();
     
-    // Play a dual tone beep
     setTimeout(() => {
       oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
       setTimeout(() => {
@@ -44,7 +52,6 @@ function updateClock() {
   const timeString = now.toTimeString().split(' ')[0];
   document.getElementById('current-time').textContent = timeString;
   
-  // Update timeline highlights every second/minute
   updateActiveTimelineItem(now);
 }
 
@@ -163,103 +170,156 @@ function startQuickFiveMinutes() {
   alert('행동을 아주 잘게 쪼개어 시동을 겁니다. 5분만 해봐요! 💪');
 }
 
-// 3. Routine Progress Checklist
-let routineStates = {};
+// 3. Routine Progress Status and Memos
+// states: pending | success | fail
+let routineStatus = {};
 let routineMemos = {};
+let failureReasons = {};
 
-function injectMemoUI() {
+function injectInteractiveUI() {
   const timelineItems = document.querySelectorAll('.timeline-item');
   
   timelineItems.forEach(item => {
     const id = item.id;
     
-    // 1. Inject Memo toggle button in timeline-action
+    // 1. Prepend Memo toggle button in timeline-action & Replace checklist with success/fail buttons
     const actionEl = item.querySelector('.timeline-action');
-    if (actionEl && !actionEl.querySelector('.btn-memo-toggle')) {
-      const btn = document.createElement('button');
-      btn.className = 'btn-memo-toggle';
-      btn.id = `memo-btn-${id}`;
-      btn.innerHTML = '✏️';
-      btn.title = '활동 메모 기록';
-      btn.onclick = (e) => {
-        e.preventDefault();
-        toggleMemoContainer(id);
-      };
-      actionEl.insertBefore(btn, actionEl.firstChild);
+    if (actionEl) {
+      actionEl.innerHTML = `
+        <div class="timeline-status-group">
+          <button class="btn-memo-toggle" id="memo-btn-${id}" onclick="toggleMemoContainer('${id}')" title="활동 메모 기록">✏️</button>
+          <button class="btn-status success" id="status-success-${id}" onclick="setRoutineStatus('${id}', 'success')">👍 성공</button>
+          <button class="btn-status fail" id="status-fail-${id}" onclick="setRoutineStatus('${id}', 'fail')">😢 실패</button>
+        </div>
+      `;
     }
     
-    // 2. Inject Memo Container at the end of timeline-item
+    // 2. Inject Memo Container
     if (!item.querySelector('.timeline-memo-container')) {
-      const container = document.createElement('div');
-      container.className = 'timeline-memo-container';
-      container.id = `memo-container-${id}`;
-      container.innerHTML = `
+      const memoContainer = document.createElement('div');
+      memoContainer.className = 'timeline-memo-container';
+      memoContainer.id = `memo-container-${id}`;
+      memoContainer.innerHTML = `
         <input type="text" class="timeline-memo-input" id="memo-input-${id}" 
                placeholder="이 시간에 대신 무엇을 하셨나요? 기록해 보세요." 
                onchange="saveMemo('${id}')">
       `;
-      item.appendChild(container);
+      item.appendChild(memoContainer);
+    }
+
+    // 3. Inject Failure Reason Container
+    if (!item.querySelector('.timeline-fail-container')) {
+      const failContainer = document.createElement('div');
+      failContainer.className = 'timeline-fail-container';
+      failContainer.id = `fail-container-${id}`;
+      failContainer.innerHTML = `
+        <input type="text" class="timeline-fail-input" id="fail-input-${id}" 
+               placeholder="실패한 원인을 입력해 주세요. (예: 늦잠, 몸 상태 안 좋음 등)" 
+               onchange="saveFailureReason('${id}')">
+      `;
+      item.appendChild(failContainer);
     }
   });
 }
 
-function loadRoutines() {
-  const saved = localStorage.getItem('routineStates');
-  if (saved) {
-    routineStates = JSON.parse(saved);
-  }
+function loadRoutineStates() {
+  const savedStatus = localStorage.getItem('routineStatus');
+  const savedMemos = localStorage.getItem('routineMemos');
+  const savedFailures = localStorage.getItem('failureReasons');
   
-  Object.keys(routineStates).forEach(id => {
-    const item = document.getElementById(id);
-    if (item) {
-      const checkbox = item.querySelector('.timeline-checkbox input');
-      if (checkbox) {
-        checkbox.checked = routineStates[id];
-        if (routineStates[id]) {
-          item.classList.add('completed');
-        } else {
-          item.classList.remove('completed');
-        }
-      }
-    }
+  if (savedStatus) routineStatus = JSON.parse(savedStatus);
+  if (savedMemos) routineMemos = JSON.parse(savedMemos);
+  if (savedFailures) failureReasons = JSON.parse(savedFailures);
+  
+  // Apply saved values to UI
+  Object.keys(routineStatus).forEach(id => {
+    const status = routineStatus[id];
+    applyStatusUI(id, status);
+  });
+  
+  Object.keys(routineMemos).forEach(id => {
+    const text = routineMemos[id];
+    const input = document.getElementById(`memo-input-${id}`);
+    if (input) input.value = text;
+    updateMemoIndicator(id, text);
+  });
+
+  Object.keys(failureReasons).forEach(id => {
+    const text = failureReasons[id];
+    const input = document.getElementById(`fail-input-${id}`);
+    if (input) input.value = text;
+    updateFailureIndicator(id, text);
   });
   
   updateOverallProgress();
 }
 
-function toggleRoutine(id) {
-  const item = document.getElementById(id);
-  const checkbox = item.querySelector('.timeline-checkbox input');
+function setRoutineStatus(id, status) {
+  const currentStatus = routineStatus[id] || 'pending';
   
-  routineStates[id] = checkbox.checked;
-  
-  if (checkbox.checked) {
-    item.classList.add('completed');
+  // Toggle off if same status is clicked
+  if (currentStatus === status) {
+    routineStatus[id] = 'pending';
   } else {
-    item.classList.remove('completed');
+    routineStatus[id] = status;
   }
   
-  localStorage.setItem('routineStates', JSON.stringify(routineStates));
+  localStorage.setItem('routineStatus', JSON.stringify(routineStatus));
+  applyStatusUI(id, routineStatus[id]);
   updateOverallProgress();
+}
+
+function applyStatusUI(id, status) {
+  const item = document.getElementById(id);
+  const btnSuccess = document.getElementById(`status-success-${id}`);
+  const btnFail = document.getElementById(`status-fail-${id}`);
+  const failContainer = document.getElementById(`fail-container-${id}`);
+  
+  if (!item) return;
+  
+  // Reset classes and stickers
+  btnSuccess.classList.remove('active');
+  btnFail.classList.remove('active');
+  item.classList.remove('completed');
+  
+  const existingSticker = item.querySelector('.praise-sticker');
+  if (existingSticker) existingSticker.remove();
+  
+  if (failContainer) {
+    failContainer.classList.remove('open');
+  }
+  
+  if (status === 'success') {
+    btnSuccess.classList.add('active');
+    item.classList.add('completed');
+    
+    // Add random praise sticker
+    const stickerIdx = Math.abs(id.split('-')[1] || 0) % STICKERS.length;
+    const sticker = STICKERS[stickerIdx];
+    
+    const stickerEl = document.createElement('div');
+    stickerEl.className = 'praise-sticker';
+    stickerEl.innerHTML = `
+      <div class="praise-sticker-inner">${sticker.emoji}</div>
+      <div class="praise-sticker-text">${sticker.text}</div>
+    `;
+    item.appendChild(stickerEl);
+    
+    // Remove failure indicator if it exists
+    const failIndicator = item.querySelector('.timeline-fail-indicator');
+    if (failIndicator) failIndicator.remove();
+    
+  } else if (status === 'fail') {
+    btnFail.classList.add('active');
+    
+    // Expand failure container
+    if (failContainer) {
+      failContainer.classList.add('open');
+    }
+  }
 }
 
 // 4. Timeline Memos Logic
-function loadMemos() {
-  const saved = localStorage.getItem('routineMemos');
-  if (saved) {
-    routineMemos = JSON.parse(saved);
-  }
-  
-  Object.keys(routineMemos).forEach(id => {
-    const memoText = routineMemos[id];
-    const input = document.getElementById(`memo-input-${id}`);
-    if (input) {
-      input.value = memoText;
-    }
-    updateMemoIndicator(id, memoText);
-  });
-}
-
 function toggleMemoContainer(id) {
   const container = document.getElementById(`memo-container-${id}`);
   if (container) {
@@ -288,16 +348,12 @@ function updateMemoIndicator(id, text) {
   
   if (!item) return;
   
-  // Remove existing indicator
   const existingIndicator = item.querySelector('.timeline-memo-indicator');
-  if (existingIndicator) {
-    existingIndicator.remove();
-  }
+  if (existingIndicator) existingIndicator.remove();
   
   if (text) {
     if (btn) btn.classList.add('has-memo');
     
-    // Create indicator badge
     const contentEl = item.querySelector('.timeline-content');
     if (contentEl) {
       const indicator = document.createElement('div');
@@ -310,22 +366,47 @@ function updateMemoIndicator(id, text) {
   }
 }
 
-// 5. Core Task Widget logic (Max 3 Tasks)
+// 5. Failure Reason Logic
+function saveFailureReason(id) {
+  const input = document.getElementById(`fail-input-${id}`);
+  if (!input) return;
+  
+  const text = input.value.trim();
+  if (text) {
+    failureReasons[id] = text;
+  } else {
+    delete failureReasons[id];
+  }
+  
+  localStorage.setItem('failureReasons', JSON.stringify(failureReasons));
+  updateFailureIndicator(id, text);
+}
+
+function updateFailureIndicator(id, text) {
+  const item = document.getElementById(id);
+  if (!item) return;
+  
+  const existingIndicator = item.querySelector('.timeline-fail-indicator');
+  if (existingIndicator) existingIndicator.remove();
+  
+  if (text && routineStatus[id] === 'fail') {
+    const contentEl = item.querySelector('.timeline-content');
+    if (contentEl) {
+      const indicator = document.createElement('div');
+      indicator.className = 'timeline-fail-indicator';
+      indicator.innerHTML = `⚠️ 실패 원인: ${text}`;
+      contentEl.appendChild(indicator);
+    }
+  }
+}
+
+// 6. Core Task Widget logic (Max 3 Tasks)
 let coreTasks = [];
 
 function loadCoreTasks() {
   const saved = localStorage.getItem('coreTasks');
   if (saved) {
     coreTasks = JSON.parse(saved);
-  } else {
-    // Migrate old coreTask if exists
-    const oldSaved = localStorage.getItem('coreTask');
-    if (oldSaved) {
-      const oldTask = JSON.parse(oldSaved);
-      coreTasks = [oldTask];
-      localStorage.removeItem('coreTask');
-      localStorage.setItem('coreTasks', JSON.stringify(coreTasks));
-    }
   }
   renderCoreTasks();
 }
@@ -372,7 +453,6 @@ function renderCoreTasks() {
   const container = document.getElementById('core-task-list');
   container.innerHTML = '';
   
-  // Update register button state
   const btnAdd = document.querySelector('.btn-add');
   const input = document.getElementById('core-task-input');
   if (coreTasks.length >= 3) {
@@ -405,17 +485,16 @@ function renderCoreTasks() {
   });
 }
 
-// 6. Overall Day Progress Calculator
+// 7. Overall Day Progress Calculator (Based on Success status only)
 function updateOverallProgress() {
   const totalRoutines = 13;
-  const checkedRoutines = Object.values(routineStates).filter(Boolean).length;
+  // Calculate achievement progress only when routine is success
+  const successfulRoutines = Object.values(routineStatus).filter(status => status === 'success').length;
   
-  // Weighted progress
   const coreTaskWeight = 3;
   let totalScoreMax = totalRoutines;
-  let currentScore = checkedRoutines;
+  let currentScore = successfulRoutines;
   
-  // Calculate based on up to 3 core tasks
   coreTasks.forEach(task => {
     totalScoreMax += coreTaskWeight;
     if (task.completed) {
@@ -437,14 +516,13 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateClock, 1000);
   updateClock();
   
-  // Inject Memo buttons & inputs
-  injectMemoUI();
+  // Inject interactive buttons and container inputs
+  injectInteractiveUI();
   
   const circleProgress = document.getElementById('timer-progress');
   if (circleProgress) circleProgress.style.strokeDashoffset = 502;
   
-  loadRoutines();
-  loadMemos();
+  loadRoutineStates();
   loadCoreTasks();
 
   // Register PWA Service Worker
